@@ -1,0 +1,70 @@
+Data quality checks
+   {'rows': 1067371, 'invoices': 53628, 'stock_codes': 5305, 'first_ts': Timestamp('2009-12-01 07:45:00'), 'last_ts': Timestamp('2011-12-09 12:50:00')}
+   {'dup_share_in_overlap': 1.0, 'dup_share_elsewhere': 0.021711295331719366}
+   {'non_product_rows': 6093.0, 'cancellation_rows': 19494.0, 'zero_price_rows': 6207.0}
+   rows after cleaning: 1032918 | SKUs segmented: 4163
+
+Segment matrix (year 1)
+ abc xyz segment  skus  sku_share     revenue  revenue_share  median_cv  avg_zero_week_share
+  A   X      AX     9      0.002  341834.500          0.034      0.442                0.019
+  A   Y      AY   254      0.061 2856809.070          0.283      0.819                0.068
+  A   Z      AZ   731      0.176 4886195.010          0.483      1.781                0.355
+  B   Y      BY    71      0.017  119057.900          0.012      0.844                0.086
+  B   Z      BZ   961      0.231 1397987.020          0.138      2.113                0.459
+  C   Y      CY     8      0.002    5009.930          0.000      0.939                0.132
+  C   Z      CZ  2129      0.511  500668.575          0.050      2.965                0.752
+
+Policy comparison (fit = first 26 weeks of year 2, test = last 26, year = all 52)
+                   policy window  revenue_fill_rate  avg_inventory_value  lost_sales_value  uniform_inventory_for_same_fill  inventory_vs_uniform_same_fill
+             Uniform 95%    fit             0.8866         1422647.5386       399600.7853                     1422647.5386                          0.0000
+             Uniform 95%   test             0.8746         1277538.8857       525791.3833                     1277538.8857                          0.0000
+             Uniform 95%   year             0.8801         1350093.2122       925392.1686                     1350093.2122                          0.0000
+Textbook ABC/XYZ targets    fit             0.8810         1382945.6894       419225.4327                     1361551.4739                          0.0157
+Textbook ABC/XYZ targets   test             0.8705         1231417.7995       542917.8185                     1246394.9523                         -0.0120
+Textbook ABC/XYZ targets   year             0.8753         1307181.7445       962143.2512                     1307636.9913                         -0.0003
+   Optimized per segment    fit             0.8874         1351711.5707       396538.6302                     1432988.2641                         -0.0567
+   Optimized per segment   test             0.8676         1226488.2812       555262.3980                     1223967.8509                          0.0021
+   Optimized per segment   year             0.8766         1289099.9259       951801.0281                     1319584.7130                         -0.0231
+
+Targets per segment
+ segment  skus  textbook_target  optimized_target  uniform95_sold  uniform95_demand  uniform95_inventory  optimized_sold  optimized_demand  optimized_inventory  uniform95_fill  optimized_fill
+     AX     9             0.98             0.990      106394.862        109300.550            12064.225      108448.313        109300.550            15721.906           0.973           0.992
+     AY   254             0.97             0.990     1055735.243       1143483.900           163099.749     1092557.592       1143483.900           211680.941           0.923           0.955
+     AZ   731             0.95             0.880     1726550.975       1956252.940           710114.322     1640393.655       1956252.940           553589.415           0.883           0.839
+     BY    71             0.95             0.995       38321.427         42470.280             9672.984       40301.087         42470.280            13687.031           0.902           0.949
+     BZ   961             0.92             0.940      482638.976        601024.460           236073.903      477921.936        601024.460           225900.003           0.803           0.795
+     CY     8             0.90             0.920        1197.067          1445.540              419.640        1162.538          1445.540              380.707           0.828           0.804
+     CZ  2129             0.85             0.995      257255.092        339907.355           146094.064      277837.506        339907.355           205528.278           0.757           0.817
+
+Dormancy rule, full year 2
+                               rule  weeks_without_sale  revenue_fill_rate  avg_inventory_value  lost_sales_value  in_stock_rate_on_demand_weeks  inventory_change  extra_lost_sales  demand_value
+             No rule (uniform 95%)                 NaN             0.8801         1350093.2122       925392.1686                         0.9123            0.0000            0.0000    7716227.38
+ Stop after 8 weeks without a sale                 8.0             0.8797         1179502.1476       928256.1828                         0.9102           -0.1264         2864.0142    7716227.38
+Stop after 13 weeks without a sale                13.0             0.8798         1209144.8614       927165.8767                         0.9109           -0.1044         1773.7081    7716227.38
+Stop after 17 weeks without a sale                17.0             0.8799         1222298.7573       926510.7771                         0.9113           -0.0947         1118.6085    7716227.38
+Stop after 26 weeks without a sale                26.0             0.8800         1255690.5748       925946.7666                         0.9118           -0.0699          554.5981    7716227.38
+
+Items that never sold in year 2
+ {'skus_not_sold_in_year2': 959, 'share_of_skus': 0.23036271919288975, 'avg_inventory_value_on_them': 217836.71246403374, 'share_of_inventory': 0.16134938721019604}
+
+Summary
+ skus_segmented                         4.163000e+03
+share_skus_Z                           9.178477e-01
+share_revenue_Z                        6.712648e-01
+share_skus_A                           2.387701e-01
+year2_demand_value                     7.716227e+06
+uniform95_fill_rate                    8.800719e-01
+uniform95_avg_inventory                1.350093e+06
+textbook_vs_uniform_same_fill_year    -3.481447e-04
+textbook_vs_uniform_same_fill_test    -1.201638e-02
+optimized_vs_uniform_same_fill_fit    -5.671832e-02
+optimized_vs_uniform_same_fill_test    2.059229e-03
+dead_skus_not_sold_in_year2            9.590000e+02
+dead_share_of_skus                     2.303627e-01
+dead_avg_inventory_value_on_them       2.178367e+05
+dead_share_of_inventory                1.613494e-01
+dormancy8_inventory_change            -1.263550e-01
+dormancy8_extra_lost_sales             2.864014e+03
+dormancy8_fill_rate                    8.797008e-01
+
+Outputs written to /home/claude/projects/inventory-abc-xyz-optimization/outputs and /home/claude/projects/inventory-abc-xyz-optimization/charts
