@@ -6,7 +6,7 @@
 
 ---
 
-## Result
+## Results
 
 | Policy, replayed on year 2 | Inventory vs. a uniform target at the same fill rate |
 |---|---|
@@ -16,7 +16,7 @@
 
 ![Policy trade-off](charts/03_policy_tradeoff.png)
 
-**What this means for a planner**
+**Takeaways**
 1. **Segmentation alone didn't move the needle.** Giving A items higher service targets and C items lower ones just shifts stock between segments. It's within about 1% of a flat 95% target at the same fill rate.
 2. **Tuning targets from data overfit.** Targets fitted on December–May didn't hold up on June–November, a different season. A planner who'd reported the 5.7% "saving" would have been wrong.
 3. **The real waste was items that had stopped selling.** 959 SKUs (23%) that sold in year 1 never sold again in year 2, yet a standard policy kept **16% of average inventory** on them. A dormancy rule cuts $171K of average stock (at selling price) and barely touches revenue: fill rate moves from 88.01% to 87.97%.
@@ -69,7 +69,7 @@ The **dormancy rule** sets a SKU's order-up-to level to zero once it has had no 
 
 ---
 
-## Run it
+## Running it
 
 ```bash
 pip install -r requirements.txt
@@ -77,7 +77,7 @@ pip install -r requirements.txt
 python run_all.py
 ```
 
-Runs in a few seconds and rebuilds every number and chart; console output is in [`outputs/run_log.txt`](outputs/run_log.txt).
+A full run takes a few seconds and regenerates all outputs; console output is in [`outputs/run_log.txt`](outputs/run_log.txt).
 
 ```
 sql/
