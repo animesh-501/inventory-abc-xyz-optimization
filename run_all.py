@@ -9,6 +9,7 @@ import pandas as pd  # noqa: E402
 import charts  # noqa: E402
 import config as C  # noqa: E402
 import data  # noqa: E402
+import intermittent  # noqa: E402
 import optimize  # noqa: E402
 
 pd.set_option("display.width", 250)
@@ -32,6 +33,14 @@ def main():
     print("\nDormancy rule, full year 2\n", dormancy.round(4).to_string(index=False))
     print("\nItems that never sold in year 2\n", opt["dead_stock"])
 
+    im = intermittent.run(t["weekly_demand"], seg)
+    print("\nSyntetos-Boylan demand classes (year 1)\n", im["class_summary"].round(3).to_string(index=False))
+    print("\nXYZ class vs Syntetos-Boylan class (SKUs)\n", im["xyz_cross"].to_string())
+    print("\nIntermittent-demand forecasts, full year 2 (compared at the current policy's fill rate)\n",
+          im["comparison"].round(4).to_string(index=False))
+    print("\nForecast accuracy, intermittent/lumpy SKUs, one week ahead\n", im["accuracy"].round(4).to_string(index=False))
+    print("\nSensitivity to the smoothing constant\n", im["sensitivity"].round(4).to_string(index=False))
+
     comp = opt["comparison"].set_index(["policy", "window"])
     best = dormancy.iloc[1]
     summary = {
@@ -50,6 +59,15 @@ def main():
         "dormancy8_inventory_change": best.inventory_change,
         "dormancy8_extra_lost_sales": best.extra_lost_sales,
         "dormancy8_fill_rate": best.revenue_fill_rate,
+        "intermittent_or_lumpy_skus": im["lumpy_skus"],
+        "intermittent_or_lumpy_dead_skus": im["lumpy_dead_skus"],
+        **{f"{k}_vs_current_same_fill": im["comparison"].set_index("method").loc[m, "inventory_vs_current_same_fill"]
+           for k, m in [("sba", "SBA on intermittent/lumpy SKUs"), ("tsb", "TSB on intermittent/lumpy SKUs"),
+                        ("dormancy8", "13-week average (current) + 8-week dormancy rule"),
+                        ("tsb_dormancy8", "TSB on intermittent/lumpy SKUs + 8-week dormancy rule")]},
+        **{f"{k}_forecast_on_dead_skus": im["accuracy"].set_index("method").loc[m, "forecast_on_dead_skus"]
+           for k, m in [("ma13", "13-week average (current)"), ("sba", "SBA on intermittent/lumpy SKUs"),
+                        ("tsb", "TSB on intermittent/lumpy SKUs")]},
     }
     print("\nSummary\n", pd.Series(summary).to_string())
 
@@ -60,9 +78,14 @@ def main():
     opt["uniform_curve"].to_csv(C.OUT_DIR / "uniform_tradeoff.csv", index=False)
     opt["by_segment"].to_csv(C.OUT_DIR / "targets_by_segment.csv", index=False)
     dormancy.to_csv(C.OUT_DIR / "dormancy_rule.csv", index=False)
+    im["classes"].to_csv(C.OUT_DIR / "demand_classes.csv", index=False)
+    im["comparison"].to_csv(C.OUT_DIR / "intermittent_comparison.csv", index=False)
+    im["curves"].to_csv(C.OUT_DIR / "intermittent_tradeoff.csv", index=False)
+    im["accuracy"].to_csv(C.OUT_DIR / "intermittent_accuracy.csv", index=False)
+    im["sensitivity"].to_csv(C.OUT_DIR / "intermittent_sensitivity.csv", index=False)
     pd.Series(summary).to_csv(C.OUT_DIR / "summary.csv", header=["value"])
 
-    charts.make_all(t, opt, dormancy)
+    charts.make_all(t, opt, dormancy, im)
     print("\nOutputs written to outputs and charts")
 
 

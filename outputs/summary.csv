@@ -17,3 +17,12 @@ dead_share_of_inventory,0.16134938721019604
 dormancy8_inventory_change,-0.12635502723998393
 dormancy8_extra_lost_sales,2864.014185118489
 dormancy8_fill_rate,0.8797007738312267
+intermittent_or_lumpy_skus,3293.0
+intermittent_or_lumpy_dead_skus,934.0
+sba_vs_current_same_fill,0.12199355438133841
+tsb_vs_current_same_fill,-0.0013998226894660348
+dormancy8_vs_current_same_fill,-0.12416255064280968
+tsb_dormancy8_vs_current_same_fill,-0.13489266548375578
+ma13_forecast_on_dead_skus,22492.475000000002
+sba_forecast_on_dead_skus,1985985.4960520563
+tsb_forecast_on_dead_skus,57071.47612221778

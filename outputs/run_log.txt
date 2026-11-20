@@ -47,6 +47,46 @@ Stop after 26 weeks without a sale                26.0             0.8800       
 Items that never sold in year 2
  {'skus_not_sold_in_year2': 959, 'share_of_skus': 0.23036271919288975, 'avg_inventory_value_on_them': 217836.71246403374, 'share_of_inventory': 0.16134938721019604}
 
+Syntetos-Boylan demand classes (year 1)
+     sb_class  skus  revenue_y1  median_adi  median_cv2  sku_share  revenue_share
+      smooth   134 1667438.890       1.040       0.387      0.032          0.165
+     erratic   736 4083611.270       1.106       1.210      0.177          0.404
+intermittent   942 1071024.615       8.667       0.222      0.226          0.106
+       lumpy  2351 3285487.230       2.737       1.328      0.565          0.325
+
+XYZ class vs Syntetos-Boylan class (SKUs)
+ sb_class  erratic  intermittent  lumpy  smooth
+xyz                                           
+X               0             0      0       9
+Y             192            16      0     125
+Z             544           926   2351       0
+
+Intermittent-demand forecasts, full year 2 (compared at the current policy's fill rate)
+                                                method  fill_rate_at_95_target  inventory_at_95_target  inventory_at_current_fill  inventory_vs_current_same_fill
+                            13-week average (current)                  0.8801            1350093.2122               1350093.2122                          0.0000
+     13-week average (current) + 8-week dormancy rule                  0.8797            1179502.1476               1182462.1954                         -0.1242
+                       SBA on intermittent/lumpy SKUs                  0.8554            1309381.2383               1514795.8819                          0.1220
+SBA on intermittent/lumpy SKUs + 8-week dormancy rule                  0.8550            1034708.1026               1208096.2426                         -0.1052
+                       TSB on intermittent/lumpy SKUs                  0.8762            1311695.0379               1348203.3211                         -0.0014
+TSB on intermittent/lumpy SKUs + 8-week dormancy rule                  0.8758            1134903.5460               1167975.5401                         -0.1349
+
+Forecast accuracy, intermittent/lumpy SKUs, one week ahead
+                         method   wape   bias  forecast_on_dead_skus  bias_on_live_skus  actual_demand
+     13-week average (current) 0.9955 0.0879             22492.4750             0.0817     3631146.05
+SBA on intermittent/lumpy SKUs 1.5658 0.4280           1985985.4961            -0.1190     3631146.05
+TSB on intermittent/lumpy SKUs 1.0139 0.1156             57071.4761             0.0999     3631146.05
+
+Sensitivity to the smoothing constant
+ method  alpha  inventory_vs_current_same_fill
+   SBA   0.05                          0.1973
+   TSB   0.05                          0.0380
+   SBA   0.10                          0.1220
+   TSB   0.10                         -0.0014
+   SBA   0.20                          0.0772
+   TSB   0.20                         -0.0276
+   SBA   0.30                          0.0665
+   TSB   0.30                         -0.0364
+
 Summary
  skus_segmented                         4.163000e+03
 share_skus_Z                           9.178477e-01
@@ -66,5 +106,14 @@ dead_share_of_inventory                1.613494e-01
 dormancy8_inventory_change            -1.263550e-01
 dormancy8_extra_lost_sales             2.864014e+03
 dormancy8_fill_rate                    8.797008e-01
+intermittent_or_lumpy_skus             3.293000e+03
+intermittent_or_lumpy_dead_skus        9.340000e+02
+sba_vs_current_same_fill               1.219936e-01
+tsb_vs_current_same_fill              -1.399823e-03
+dormancy8_vs_current_same_fill        -1.241626e-01
+tsb_dormancy8_vs_current_same_fill    -1.348927e-01
+ma13_forecast_on_dead_skus             2.249248e+04
+sba_forecast_on_dead_skus              1.985985e+06
+tsb_forecast_on_dead_skus              5.707148e+04
 
 Outputs written to outputs and charts

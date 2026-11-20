@@ -100,8 +100,48 @@ def dormancy_bars(dormancy):
     _save(fig, "04_dormancy_rule.png")
 
 
-def make_all(t, opt, dormancy):
+def intermittent_forecasts(res):
+    """Left: stock vs fill rate per forecast. Right: what each forecast expected from items that never sold again."""
+    cur, sba, tsb = "13-week average (current)", "SBA on intermittent/lumpy SKUs", "TSB on intermittent/lumpy SKUs"
+    style = {cur: (MUTED, "13-week average (current)"), sba: (WARN, "SBA (Croston, bias-corrected)"),
+             tsb: (ACCENT, "TSB")}
+    fig, (ax, bx) = plt.subplots(1, 2, figsize=(11, 4.4), gridspec_kw={"width_ratios": [1.35, 1]})
+    for m, (color, label) in style.items():
+        g = res["curves"][res["curves"].method == m].sort_values("avg_inventory_value")
+        ax.plot(g.avg_inventory_value / 1e6, g.revenue_fill_rate * 100, color=color, lw=2, marker="o", ms=3.5,
+                label=label)
+    ax.axhline(res["current_fill"] * 100, color=INK, lw=0.8, ls=":")
+    ax.text(0.86, res["current_fill"] * 100 - 0.6, f"today's fill rate {res['current_fill']:.1%}", fontsize=8.5, color=MUTED)
+    comp = res["comparison"].set_index("method")
+    for m, offset, ha in [(sba, (8, -16), "left"), (tsb, (-8, 10), "right")]:
+        x = comp.loc[m, "inventory_at_current_fill"]
+        ax.scatter([x / 1e6], [res["current_fill"] * 100], color=style[m][0], s=40, zorder=5)
+        ax.annotate(f"{style[m][1].split(' (')[0]}: {comp.loc[m, 'inventory_vs_current_same_fill']:+.1%} stock",
+                    (x / 1e6, res["current_fill"] * 100), xytext=offset, textcoords="offset points",
+                    fontsize=8.5, color=INK, ha=ha)
+    ax.set_xlabel("Average inventory value, $ millions (at selling price)")
+    ax.set_ylabel("Revenue fill rate")
+    ax.yaxis.set_major_formatter(mtick.PercentFormatter(decimals=0))
+    ax.legend(loc="lower right", fontsize=8.5)
+    ax.set_title("Same service targets (80% ... 99%), three forecasts")
+
+    acc = res["accuracy"].set_index("method").loc[[cur, sba, tsb]]
+    bars = bx.barh([style[m][1] for m in acc.index], acc.forecast_on_dead_skus / 1e6,
+                   color=[style[m][0] for m in acc.index], height=0.55)
+    bx.set_axisbelow(True)
+    bx.bar_label(bars, labels=[f"${v / 1e6:.2f}M" for v in acc.forecast_on_dead_skus], padding=4, fontsize=9, color=INK)
+    bx.invert_yaxis()
+    bx.set_xlim(0, acc.forecast_on_dead_skus.max() / 1e6 * 1.3)
+    bx.grid(axis="y", visible=False)
+    bx.set_xlabel("Year-2 forecast, $ millions (at selling price)")
+    bx.set_title(f"Demand forecast for {res['lumpy_dead_skus']:,} items\nthat never sold again (actual: $0)", fontsize=11)
+    _save(fig, "05_intermittent_forecasts.png")
+
+
+def make_all(t, opt, dormancy, intermittent=None):
     segment_matrix(t["segment_matrix"])
     variability(t["segments"])
     tradeoff(opt["uniform_curve"], opt["comparison"], dormancy)
     dormancy_bars(dormancy)
+    if intermittent is not None:
+        intermittent_forecasts(intermittent)
